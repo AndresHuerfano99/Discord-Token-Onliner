@@ -6,16 +6,25 @@ import sys
 import subprocess
 import json
 import random
+import asyncio
 
 try:
     import aiohttp
-    import asyncio
     from pystyle import Colors, Colorate, Center
 except Exception as e:
     print(e)
 
-# Global options for status selection
+
+# Global constant for available status options
 STATUS_OPTIONS = ["online", "idle"]
+
+
+def clear_screen() -> None:
+    """
+    Clears the terminal screen.
+    """
+    os.system("cls" if os.name == "nt" else "clear")
+
 
 class Stats:
     """
@@ -24,11 +33,19 @@ class Stats:
     online = 0
     total = 0
 
+
 class Onliner:
     """
     Connects to Discord's WebSocket gateway and sends presence data using the provided token.
     """
+
     def __init__(self, token: str) -> None:
+        """
+        Initialize an Onliner instance.
+
+        Args:
+            token (str): Discord token used for connection.
+        """
         self.token = token
 
     async def start(self) -> None:
@@ -46,6 +63,9 @@ class Onliner:
     async def _send_initial_presence(self, ws) -> None:
         """
         Sends the initial presence payload to Discord.
+
+        Args:
+            ws: Active WebSocket connection.
         """
         try:
             payload = {
@@ -80,8 +100,10 @@ class Onliner:
 
     async def _handle_events(self, ws) -> None:
         """
-        Listens for events on the WebSocket connection.
-        Starts a heartbeat task when the 'hello' event is received.
+        Listens for events on the WebSocket connection and starts the heartbeat task when needed.
+
+        Args:
+            ws: Active WebSocket connection.
         """
         try:
             async for msg in ws:
@@ -97,8 +119,8 @@ class Onliner:
         Sends a heartbeat message to Discord at regular intervals.
 
         Args:
-            ws: The active WebSocket connection.
-            interval: Time interval (in seconds) between heartbeats.
+            ws: Active WebSocket connection.
+            interval (float): Time (in seconds) between heartbeat messages.
         """
         try:
             while True:
@@ -114,7 +136,7 @@ async def banner_thread() -> None:
     Continuously updates and displays a banner with current statistics.
     """
     while True:
-        os.system("cls")
+        clear_screen()
         banner = f"""
           ╭───────────────────────────────────────╮
                          Online: {Stats.online:<5}
@@ -130,11 +152,11 @@ async def main() -> None:
     Main function to load tokens, create Onliner instances for each token,
     and start the banner thread.
     """
-    os.system("cls")
+    clear_screen()
     tasks = []
 
     try:
-        # Read tokens from file and update total count
+        # Read tokens from file and update the total count
         with open("./tokens.txt", "r") as tokens_file:
             tokens = [line.strip() for line in tokens_file if line.strip()]
         Stats.total = len(tokens)
@@ -155,10 +177,10 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    # Install requirements.
-    if not os.getenv('requirements'):
-        subprocess.Popen(['start', 'start.bat'], shell=True)
+    # If requirements are not set via environment variable, run the batch file and exit.
+    if not os.getenv("requirements"):
+        subprocess.Popen(["start", "start.bat"], shell=True)
         sys.exit()
 
-    os.system('cls' if os.name == 'nt' else 'clear')
+    clear_screen()
     asyncio.run(main())

@@ -1,6 +1,6 @@
-pystyle==2.9
-aiohttp==3.11.12
-asyncio==3.4.3
-requests==2.32.3
-datetime==5.5
-colorama==0.4.6
+pystyle
+aiohttp
+asyncio
+requests
+datetime
+colorama
