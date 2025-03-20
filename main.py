@@ -15,7 +15,6 @@ except Exception as e:
     print(e)
 
 
-# Global constant for available status options
 STATUS_OPTIONS = ["online", "idle"]
 
 
